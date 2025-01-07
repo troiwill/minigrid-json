@@ -25,7 +25,7 @@ class SimpleTestEnv(MiniGridEnv):
         self.start_pos = (4, 4)
         self.start_dir = 0
 
-    def _gen_grid(self, width: int | None = None, height: int | None = None) -> Grid:
+    def _gen_grid(self, width: int | None = None, height: int | None = None) -> None:
         self.grid = GridJson.load("desc.json", grid_fn=Grid)
 
         # Place the agent and set the mission.

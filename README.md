@@ -20,7 +20,7 @@ you would like to save the file and `env_name` is the name of the environment.
 
 2. To load a grid, add the following code to your Minigrid (sub)class:
 ```
-def _gen_grid(self, width: int | None = None, height: int | None = None):
+def _gen_grid(self, width: int | None = None, height: int | None = None) -> None:
     self.grid = GridJson.load(self.description_path, grid_fn=Grid)
 
     # The rest of the typical _gen_grid code.
@@ -31,3 +31,19 @@ function will place all world objects that were in the grid when it was saved.
 
 For more detailed usage, please look at the scripts in the `tests` directory.
 
+## Development Installation
+
+Install the following packages within a virtual environment.
+```
+pip install minigrid, click, pydantic, black, eval_type_backport
+```
+
+## Test Scripts
+
+To run the test scripts, run the following code:
+```
+pip install -e .
+cd tests
+python simple_env_export.py
+python simple_env_load.py
+```
