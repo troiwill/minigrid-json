@@ -20,7 +20,7 @@ you would like to save the file and `env_name` is the name of the environment.
 
 2. To load a grid, add the following code to your Minigrid (sub)class:
 ```
-def _gen_grid(self, width: int | None = None, height: int | None = None) -> None:
+def _gen_grid(self, width: int | None = None, height: int | None = None):
     self.grid = GridJson.load(self.description_path, grid_fn=Grid)
 
     # The rest of the typical _gen_grid code.
