@@ -1,8 +1,10 @@
 from __future__ import annotations
 from collections import OrderedDict
-from typing import Any
+from typing import Any, Tuple
 
 from pydantic import BaseModel, NonNegativeInt, PositiveInt
+
+WorldObjectDescriptor = Tuple[int, int, int]
 
 
 class GridPositionDesc(BaseModel):
@@ -18,13 +20,13 @@ class GridPositionDesc(BaseModel):
 
 
 class GridObjectDesc(BaseModel):
-    name: str
+    descriptor: WorldObjectDescriptor
     positions: list[GridPositionDesc]
 
     def export(self) -> dict[str, Any]:
         return OrderedDict(
             [
-                ("name", self.name),
+                ("descriptor", self.descriptor),
                 ("positions", list(pos.export() for pos in self.positions)),
             ]
         )
