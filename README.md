@@ -28,3 +28,20 @@ def _gen_grid(self, width: int | None = None, height: int | None = None) -> Grid
 Here, `_gen_grid` is similar to the original generate grid function. However, we ignore
 the width and height arguments since the description stores the width and height. The load
 function will place all world objects that were in the grid when it was saved.
+
+## Development Installation
+
+Install the following packages within a virtual environment.
+```
+pip install minigrid, click, pydantic, black, eval_type_backport
+```
+
+## Test Scripts
+
+To run the test scripts, run the following code:
+```
+pip install -e .
+cd tests
+python simple_env_export.py
+python simple_env_load.py
+```
