@@ -40,6 +40,9 @@ Documentation = "https://github.com/troiwill/minigrid-json"
 [tool.setuptools]
 include-package-data = true
 
+[tool.setuptools.dynamic]
+version = {attr = "minigrid_json.__version__"}
+
 [tool.setuptools.packages.find]
 include = ["minigrid_json*"]
 
