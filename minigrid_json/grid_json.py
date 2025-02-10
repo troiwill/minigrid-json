@@ -2,21 +2,10 @@ from __future__ import annotations
 import copy
 import json
 import os
-from typing import Any, Callable
+from typing import Any
 
-from minigrid.core.constants import IDX_TO_OBJECT
 from minigrid.core.grid import Grid
-from minigrid.core.world_object import (
-    WorldObj,
-    Goal,
-    Floor,
-    Lava,
-    Wall,
-    Door,
-    Key,
-    Ball,
-    Box,
-)
+from minigrid.core.world_object import WorldObj
 
 from minigrid_json.description import (
     GridEnvDesc,
@@ -31,8 +20,7 @@ class GridJson:
     @staticmethod
     def load(
         description_path: str,
-        grid_fn: Callable[[int, int, Any], Grid],
-        grid_fn_options: dict[str, Any] = dict(),
+        grid: Grid,
         object_dict: dict[int, WorldObj] = dict(),
     ) -> Grid:
         """
@@ -40,12 +28,64 @@ class GridJson:
 
         Args:
             description_path (str): Path to the JSON description file.
-            grid_fn (Callable[[int, int, Any], Grid]): Function to create the grid.
-            grid_fn_options (dict[str, Any], optional): Additional options for grid_fn. Defaults to an empty dict.
+            grid (Grid): The grid to populate.
             object_dict (dict[int, WorldObj], optional): Dictionary mapping object IDs to WorldObj classes. Defaults to an empty dict.
 
         Returns:
             Grid: The loaded grid.
+        """
+        # Load the grid environment description.
+        env_desc = GridJson.load_description(description_path)
+
+        # Convert the description to a grid environment.
+        grid = GridJson.convert_description_to_grid(
+            env_desc, grid, object_dict
+        )
+
+        return grid
+
+    @staticmethod
+    def convert_description_to_grid(
+        env_desc: GridEnvDesc,
+        grid: Grid,
+        object_dict: dict[int, WorldObj] = dict(),
+    ) -> Grid:
+        """
+        Creates a Grid from a Grid Environment Description.
+
+        Args:
+            env_desc (GridEnvDesc): A GridEnvDesc object.
+            grid (Grid): The grid to populate.
+            object_dict (dict[int, WorldObj], optional): Dictionary mapping object IDs to WorldObj classes. Defaults to an empty dict.
+
+        Returns:
+            Grid: The loaded grid.
+        """
+        for obj in env_desc.objects:
+            # Determine if there is a decoder for the given object.
+            obj_type: int = obj.descriptor[0]
+            obj_decoder = object_dict.get(obj_type, WorldObj)
+
+            # Decode the object given the descriptor.
+            object_instance = obj_decoder.decode(*obj.descriptor)
+
+            # Add the object at the given positions.
+            for pos in obj.positions:
+                grid.set(i=pos.x, j=pos.y, v=copy.deepcopy(object_instance))
+        return grid
+
+    @staticmethod
+    def load_description(
+        description_path: str,
+    ) -> GridEnvDesc:
+        """
+        Loads a grid from a JSON description file.
+
+        Args:
+            description_path (str): Path to the JSON description file.
+
+        Returns:
+            GridEnvDesc: The loaded GridEnvDesc from the JSON file.
 
         Raises:
             FileNotFoundError: If the description file is not found.
@@ -62,23 +102,7 @@ class GridJson:
 
         # Generate the description and the resulting grid.
         env_desc = GridEnvDesc.create(desc_dict)
-        grid: Grid = grid_fn(
-            width=env_desc.width, height=env_desc.height, **grid_fn_options
-        )
-
-        for obj in env_desc.objects:
-            # Determine if there is a decoder for the given object.
-            obj_type: int = obj.descriptor[0]
-            obj_decoder = object_dict.get(obj_type, WorldObj)
-
-            # Decode the object given the descriptor.
-            object_instance = obj_decoder.decode(*obj.descriptor)
-
-            # Add the object at the given positions.
-            for pos in obj.positions:
-                grid.set(i=pos.x, j=pos.y, v=copy.deepcopy(object_instance))
-
-        return grid
+        return env_desc
 
     @staticmethod
     def export(
